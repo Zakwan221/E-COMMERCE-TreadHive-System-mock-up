@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThreadHive — Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;color:#1a1a1a;display:flex;min-height:100vh}
+input,select,textarea{width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#1a1a1a;font-size:13px;outline:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:#185FA5;box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+button{cursor:pointer;font-size:13px;font-family:inherit;border-radius:8px;border:none;transition:all .15s}
+button:active{transform:scale(.98)}
+.btn-p{background:#185FA5;color:#fff;padding:8px 18px}
+.btn-p:hover{background:#0C447C}
+.btn-s{background:#f3f4f6;color:#1a1a1a;padding:8px 18px;border:1px solid #e5e7eb}
+.btn-s:hover{background:#e5e7eb}
+.btn-d{background:#E24B4A;color:#fff;padding:5px 11px}
+.btn-d:hover{background:#A32D2D}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+.bg{background:#dcfce7;color:#166534}
+.ba{background:#fef9c3;color:#854d0e}
+.br{background:#fee2e2;color:#991b1b}
+.bb{background:#dbeafe;color:#1e40af}
+.bm{background:#ede9fe;color:#5b21b6}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+.logo{padding:16px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:#185FA5;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;font-size:14px;color:#6b7280;border-left:3px solid transparent;transition:all .12s;user-select:none;position:relative}
+.nav-item:hover{background:#f9fafb;color:#1a1a1a}
+.nav-item.active{background:#eff6ff;color:#185FA5;font-weight:600;border-left-color:#185FA5}
+.nav-item i{font-size:18px;flex-shrink:0}
+.nav-badge{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#E24B4A;color:#fff;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 4px}
+.nav-logout{padding:12px 0;border-top:1px solid #e5e7eb}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;overflow-y:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:5}
+
+/* TABS */
+.tab{display:none;padding:28px}
+.tab.active{display:block}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px}
+.stat{background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:16px 20px}
+.prow{display:flex;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 16px;gap:14px}
+.orow{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.fbrow{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px;margin-bottom:10px;border-left:4px solid #e5e7eb;transition:border-left-color .15s}
+.fbrow.unread{border-left-color:#185FA5}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;border-bottom:2px solid #e5e7eb;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+
+/* PROGRESS */
+.bar{height:6px;background:#e5e7eb;border-radius:4px;overflow:hidden;min-width:80px}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:440px;border:1px solid #e5e7eb;box-shadow:0 20px 50px rgba(0,0,0,.15)}
+
+/* TAB FILTER BTNS */
+.tbtn{padding:6px 14px;border-radius:7px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:12px;cursor:pointer}
+.tbtn:hover{background:#f3f4f6}
+.tbtn.active{background:#185FA5;color:#fff;border-color:#185FA5}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:#9ca3af}
+.empty-state i{font-size:48px;display:block;margin-bottom:14px;opacity:.4}
+.empty-state p{font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-hanger" style="font-size:16px;color:#fff"></i></div>
+    <div>
+      <p style="font-weight:700;font-size:15px;line-height:1.2">ThreadHive</p>
+      <p style="font-size:11px;color:#9ca3af">Admin Panel</p>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-item active" id="nav-dashboard" onclick="goTab('dashboard')"><i class="ti ti-dashboard"></i>Dashboard</div>
+    <div class="nav-item" id="nav-analytics"  onclick="goTab('analytics')"><i class="ti ti-chart-line"></i>Analytics</div>
+    <div class="nav-item" id="nav-products"   onclick="goTab('products')"><i class="ti ti-shirt"></i>Products</div>
+    <div class="nav-item" id="nav-stock"      onclick="goTab('stock')"><i class="ti ti-packages"></i>Stock</div>
+    <div class="nav-item" id="nav-orders"     onclick="goTab('orders')"><i class="ti ti-receipt"></i>Orders</div>
+    <div class="nav-item" id="nav-feedback"   onclick="goTab('feedback')">
+      <i class="ti ti-message"></i>Feedback
+      <span class="nav-badge" id="nav-feedback-badge">0</span>
+    </div>
+  </nav>
+  <div class="nav-logout">
+    <div class="nav-item" onclick="window.location.href='index.html'"><i class="ti ti-logout"></i>Logout</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <p id="page-title" style="font-size:17px;font-weight:700">Dashboard</p>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+        <i class="ti ti-user" style="font-size:16px;color:#185FA5"></i>
+      </div>
+      <span style="font-size:13px;font-weight:600;color:#374151">Store Owner</span>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="tab active" id="tab-dashboard">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px">
+      <div class="stat">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:8px">Total products</p>
+        <p id="s-products" style="font-size:30px;font-weight:700">54</p>
+      </div>
+      <div class="stat">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:8px">Total orders</p>
+        <p id="s-orders" style="font-size:30px;font-weight:700">3</p>
+      </div>
+      <div class="stat">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:8px">Revenue</p>
+        <p id="s-revenue" style="font-size:30px;font-weight:700">$0</p>
+      </div>
+      <div class="stat">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:8px">Low stock</p>
+        <p id="s-low" style="font-size:30px;font-weight:700;color:#E24B4A">0</p>
+      </div>
+      <div class="stat" style="cursor:pointer;border-color:#dbeafe;background:#eff6ff" onclick="goTab('feedback')">
+        <p style="font-size:12px;color:#6b7280;margin-bottom:8px">Unread messages</p>
+        <p id="s-feedback" style="font-size:30px;font-weight:700;color:#185FA5">0</p>
+        <p style="font-size:11px;color:#185FA5;margin-top:4px;font-weight:600">View inbox →</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="card"><h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Stock by category</h3><canvas id="c-stock" height="220"></canvas></div>
+      <div class="card"><h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Items per category</h3><canvas id="c-items" height="220"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px">Recent orders</h3>
+      <div id="recent-orders"></div>
+    </div>
+  </div>
+
+  <!-- ── ANALYTICS ── -->
+  <div class="tab" id="tab-analytics">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+      <div class="stat"><p style="font-size:12px;color:#6b7280;margin-bottom:8px">Total stock value</p><p id="a-val" style="font-size:26px;font-weight:700">$0</p></div>
+      <div class="stat"><p style="font-size:12px;color:#6b7280;margin-bottom:8px">Avg price per item</p><p id="a-avg" style="font-size:26px;font-weight:700">$0</p></div>
+      <div class="stat"><p style="font-size:12px;color:#6b7280;margin-bottom:8px">Out of stock</p><p id="a-oos" style="font-size:26px;font-weight:700;color:#E24B4A">0</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="card"><h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Revenue potential by category</h3><canvas id="c-rev" height="220"></canvas></div>
+      <div class="card"><h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Stock health per category</h3><canvas id="c-health" height="220"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:14px">Category breakdown</h3>
+      <table>
+        <thead><tr><th>Category</th><th>Items</th><th>Total stock</th><th>Avg price</th><th>Stock value</th><th>Low stock</th><th>Out of stock</th></tr></thead>
+        <tbody id="a-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── PRODUCTS ── -->
+  <div class="tab" id="tab-products">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="pf-cat" onchange="renderProducts()" style="width:auto;padding:7px 12px;font-size:13px">
+          <option value="">All categories</option>
+          <option>Men</option><option>Men Accessories</option>
+          <option>Women</option><option>Women Accessories</option>
+          <option>Kids</option><option>Kids Accessories</option>
+        </select>
+        <input type="text" id="pf-search" placeholder="Search..." oninput="renderProducts()" style="width:180px"/>
+      </div>
+      <button class="btn-p" onclick="openAdd()" style="display:flex;align-items:center;gap:6px"><i class="ti ti-plus"></i> Add product</button>
+    </div>
+    <div id="product-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- ── STOCK ── -->
+  <div class="tab" id="tab-stock">
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px" id="stock-btns">
+      <button class="tbtn active" onclick="setStockFilter('all',this)">All</button>
+      <button class="tbtn" onclick="setStockFilter('low',this)">Low stock</button>
+      <button class="tbtn" onclick="setStockFilter('out',this)">Out of stock</button>
+      <button class="tbtn" onclick="setStockFilter('Men',this)">Men</button>
+      <button class="tbtn" onclick="setStockFilter('Men Accessories',this)">Men Acc.</button>
+      <button class="tbtn" onclick="setStockFilter('Women',this)">Women</button>
+      <button class="tbtn" onclick="setStockFilter('Women Accessories',this)">Women Acc.</button>
+      <button class="tbtn" onclick="setStockFilter('Kids',this)">Kids</button>
+      <button class="tbtn" onclick="setStockFilter('Kids Accessories',this)">Kids Acc.</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Price</th><th>Qty</th><th>Status</th><th style="min-width:120px">Level</th></tr></thead>
+        <tbody id="stock-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ORDERS ── -->
+  <div class="tab" id="tab-orders">
+    <div id="order-list"></div>
+  </div>
+
+  <!-- ── FEEDBACK ── -->
+  <div class="tab" id="tab-feedback">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div>
+        <h2 style="font-size:18px;font-weight:700">Customer Messages</h2>
+        <p style="font-size:13px;color:#6b7280;margin-top:4px">Messages submitted by customers through the Contact page</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="tbtn active" id="fb-btn-all"    onclick="setFbFilter('all',this)">All</button>
+        <button class="tbtn"        id="fb-btn-unread" onclick="setFbFilter('unread',this)">Unread</button>
+        <button class="tbtn"        id="fb-btn-read"   onclick="setFbFilter('read',this)">Read</button>
+        <button class="btn-d" style="padding:6px 14px;font-size:12px;display:flex;align-items:center;gap:5px" onclick="clearAllFeedback()">
+          <i class="ti ti-trash" style="font-size:13px"></i>Clear all
+        </button>
+      </div>
+    </div>
+    <div id="fb-stats" style="margin-bottom:18px"></div>
+    <div id="feedback-list"></div>
+  </div>
+
+</main>
+
+<!-- ADD/EDIT MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h3 style="font-size:16px;font-weight:700" id="modal-title">Add product</h3>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:22px;color:#9ca3af;cursor:pointer;line-height:1">&#x2715;</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:13px">
+      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Product name</label><input id="m-name" placeholder="e.g. Classic White Tee"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Price ($)</label><input type="number" id="m-price" placeholder="0.00" min="0" step="0.01"/></div>
+        <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Stock</label><input type="number" id="m-stock" placeholder="0" min="0"/></div>
+      </div>
+      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Category</label>
+        <select id="m-cat">
+          <option>Men</option><option>Men Accessories</option>
+          <option>Women</option><option>Women Accessories</option>
+          <option>Kids</option><option>Kids Accessories</option>
+        </select>
+      </div>
+      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px">Description</label><textarea id="m-desc" rows="2" style="resize:vertical"></textarea></div>
+      <p id="m-err" style="color:#dc2626;font-size:12px;display:none">Please fill in all required fields.</p>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn-s" onclick="closeModal()" style="flex:1">Cancel</button>
+        <button class="btn-p" onclick="saveProduct()" style="flex:1" id="m-save">Add product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────
+const CATS = ['Men','Men Accessories','Women','Women Accessories','Kids','Kids Accessories'];
+const COLORS = ['#185FA5','#378ADD','#D4537E','#ED93B1','#3B6D11','#97C459'];
+
+const products = [
+  {id:'MEN-001',name:'Classic White T-Shirt', cat:'Men',              price:29.99, stock:42, desc:'100% cotton relaxed fit tee',          img:'Men1.png'},
+  {id:'MEN-002',name:'Slim Fit Chinos',        cat:'Men',              price:59.99, stock:28, desc:'Stretch cotton slim chinos',           img:'Men2.png'},
+  {id:'MEN-003',name:'Denim Jacket',           cat:'Men',              price:89.99, stock:3,  desc:'Washed blue denim jacket',            img:'Men3.png'},
+  {id:'MEN-004',name:'Oxford Button Shirt',    cat:'Men',              price:49.99, stock:17, desc:'Classic Oxford weave shirt',          img:'Men4.png'},
+  {id:'MEN-005',name:'Linen Shorts',           cat:'Men',              price:39.99, stock:0,  desc:'Lightweight summer linen shorts',     img:'Men5.png'},
+  {id:'MEN-006',name:'Merino Wool Sweater',    cat:'Men',              price:79.99, stock:11, desc:'Fine merino crewneck',                img:'Men6.png'},
+  {id:'MEN-007',name:'Jogger Pants',           cat:'Men',              price:44.99, stock:22, desc:'Tapered cotton joggers',              img:'men7.png'},
+  {id:'MEN-008',name:'Polo Shirt',             cat:'Men',              price:34.99, stock:2,  desc:'Pique cotton polo',                  img:'men8.png'},
+  {id:'MEN-009',name:'Formal Blazer',          cat:'Men',              price:129.99,stock:8,  desc:'Single-breasted slim blazer',        img:'men9.png'},
+  {id:'MAC-001',name:'Leather Belt',           cat:'Men Accessories',  price:24.99, stock:35, desc:'Genuine leather reversible belt',    img:'Men A.png'},
+  {id:'MAC-002',name:'Wool Scarf',             cat:'Men Accessories',  price:19.99, stock:20, desc:'Soft merino wool scarf',             img:'Men A2.png'},
+  {id:'MAC-003',name:'Baseball Cap',           cat:'Men Accessories',  price:22.99, stock:0,  desc:'Structured 6-panel cap',            img:'Men A3.png'},
+  {id:'MAC-004',name:'Leather Wallet',         cat:'Men Accessories',  price:34.99, stock:14, desc:'Slim bifold genuine leather',        img:'men A4.png'},
+  {id:'MAC-005',name:'Sunglasses',             cat:'Men Accessories',  price:29.99, stock:9,  desc:'UV400 polarised lenses',            img:'men A5.png'},
+  {id:'MAC-006',name:'Knit Beanie',            cat:'Men Accessories',  price:17.99, stock:3,  desc:'Ribbed knit cuffed beanie',         img:'menA6.png'},
+  {id:'MAC-007',name:'Canvas Tote Bag',        cat:'Men Accessories',  price:21.99, stock:18, desc:'Heavy duty canvas tote',            img:'menA7.png'},
+  {id:'MAC-008',name:'Tie — Navy Stripe',      cat:'Men Accessories',  price:19.99, stock:2,  desc:'Silk blend woven tie',              img:'Men A8.png'},
+  {id:'MAC-009',name:'Pocket Square Set',      cat:'Men Accessories',  price:14.99, stock:25, desc:'Set of 3 cotton pocket squares',    img:'men A9.png'},
+  {id:'WOM-001',name:'Floral Wrap Dress',      cat:'Women',            price:64.99, stock:19, desc:'Lightweight chiffon wrap dress',     img:'women .png'},
+  {id:'WOM-002',name:'High-Waist Jeans',       cat:'Women',            price:69.99, stock:31, desc:'Stretch denim skinny fit',           img:'women 2.png'},
+  {id:'WOM-003',name:'Knit Cardigan',          cat:'Women',            price:54.99, stock:4,  desc:'Open-front longline cardigan',       img:'women 3.png'},
+  {id:'WOM-004',name:'Linen Blazer',           cat:'Women',            price:89.99, stock:7,  desc:'Relaxed linen single-breasted',      img:'women 4.png'},
+  {id:'WOM-005',name:'Satin Slip Dress',       cat:'Women',            price:74.99, stock:0,  desc:'Bias-cut satin mini dress',         img:'women 5.png'},
+  {id:'WOM-006',name:'Ribbed Tank Top',        cat:'Women',            price:24.99, stock:45, desc:'Fitted ribbed stretch tank',        img:'women 6.png'},
+  {id:'WOM-007',name:'Wide-Leg Trousers',      cat:'Women',            price:59.99, stock:13, desc:'High-rise wide leg trousers',       img:'women 7.png'},
+  {id:'WOM-008',name:'Oversized Hoodie',       cat:'Women',            price:49.99, stock:2,  desc:'Brushed fleece oversized hoodie',   img:'women 8.png'},
+  {id:'WOM-009',name:'Midi Skirt',             cat:'Women',            price:44.99, stock:16, desc:'A-line pleated midi skirt',         img:'women 9.png'},
+  {id:'WAC-001',name:'Silk Headband',          cat:'Women Accessories',price:14.99, stock:28, desc:'Twisted silk knot headband',        img:'women A.png'},
+  {id:'WAC-002',name:'Crossbody Bag',          cat:'Women Accessories',price:49.99, stock:11, desc:'Pebbled faux-leather crossbody',    img:'women A2.png'},
+  {id:'WAC-003',name:'Pearl Earrings',         cat:'Women Accessories',price:22.99, stock:0,  desc:'Freshwater pearl drop earrings',    img:'Women A3.png'},
+  {id:'WAC-004',name:'Oversized Sunglasses',   cat:'Women Accessories',price:27.99, stock:3,  desc:'Cat-eye UV400 frames',              img:'Women A4.png'},
+  {id:'WAC-005',name:'Knit Beret',             cat:'Women Accessories',price:18.99, stock:16, desc:'Soft wool-blend beret',             img:'women A5.png'},
+  {id:'WAC-006',name:'Leather Tote',           cat:'Women Accessories',price:59.99, stock:8,  desc:'Structured top-handle tote',       img:'Women A6.png'},
+  {id:'WAC-007',name:'Charm Bracelet',         cat:'Women Accessories',price:32.99, stock:14, desc:'Gold-plated charm bracelet',        img:'Women A7.png'},
+  {id:'WAC-008',name:'Silk Scarf',             cat:'Women Accessories',price:39.99, stock:6,  desc:'Printed 100% silk scarf',          img:'Women A8.png'},
+  {id:'WAC-009',name:'Hair Clip Set',          cat:'Women Accessories',price:12.99, stock:22, desc:'Set of 6 resin hair clips',        img:'Women A9.png'},
+  {id:'KID-001',name:'Graphic Tee',            cat:'Kids',             price:19.99, stock:38, desc:'Fun printed cotton tee',            img:'kids.png'},
+  {id:'KID-002',name:'Denim Dungarees',        cat:'Kids',             price:34.99, stock:0,  desc:'Adjustable strap dungarees',        img:'kids1.png'},
+  {id:'KID-003',name:'Fleece Hoodie',          cat:'Kids',             price:29.99, stock:14, desc:'Warm zip-up fleece hoodie',         img:'kids2.png'},
+  {id:'KID-004',name:'Leggings 3-Pack',        cat:'Kids',             price:24.99, stock:3,  desc:'Soft stretch leggings set',        img:'kids4.png'},
+  {id:'KID-005',name:'School Shorts',          cat:'Kids',             price:17.99, stock:22, desc:'Pull-on smart shorts',             img:'kids5.png'},
+  {id:'KID-006',name:'Puffer Jacket',          cat:'Kids',             price:44.99, stock:1,  desc:'Lightweight warm puffer',          img:'kids6.png'},
+  {id:'KID-007',name:'Striped Polo',           cat:'Kids',             price:22.99, stock:18, desc:'Classic striped polo shirt',       img:'kids7.png'},
+  {id:'KID-008',name:'Cargo Shorts',           cat:'Kids',             price:27.99, stock:9,  desc:'Multi-pocket cargo shorts',        img:'kids8.png'},
+  {id:'KID-009',name:'Swim Trunks',            cat:'Kids',             price:19.99, stock:12, desc:'Quick-dry swim trunks',            img:'kids9.png'},
+  {id:'KAC-001',name:'Kids Baseball Cap',      cat:'Kids Accessories', price:12.99, stock:30, desc:'Adjustable cotton cap',            img:'kids A1.png'},
+  {id:'KAC-002',name:'Backpack',               cat:'Kids Accessories', price:22.99, stock:18, desc:'Colourful printed backpack',       img:'kids A2.png'},
+  {id:'KAC-003',name:'Mittens & Hat Set',      cat:'Kids Accessories', price:14.99, stock:0,  desc:'Fleece-lined winter set',         img:'kids A3.png'},
+  {id:'KAC-004',name:'Rain Boots',             cat:'Kids Accessories', price:27.99, stock:7,  desc:'Rubber pull-on rain boots',       img:'kids A4.png'},
+  {id:'KAC-005',name:'Scarf Set',              cat:'Kids Accessories', price:11.99, stock:2,  desc:'Soft knit scarf & glove set',     img:'kids A5.png'},
+  {id:'KAC-006',name:'Sun Hat',                cat:'Kids Accessories', price:13.99, stock:24, desc:'Wide brim UV sun hat',             img:'kids A6.png'},
+  {id:'KAC-007',name:'Lunch Bag',              cat:'Kids Accessories', price:16.99, stock:15, desc:'Insulated kids lunch bag',         img:'kids A7.png'},
+  {id:'KAC-008',name:'Hair Ties Set',          cat:'Kids Accessories', price:8.99,  stock:40, desc:'Pack of 20 colourful hair ties',  img:'kids A8.png'},
+  {id:'KAC-009',name:'Kids Sunglasses',        cat:'Kids Accessories', price:14.99, stock:11, desc:'UV400 flexible frame sunglasses', img:'kids A9.png'},
+];
+
+const orders = [
+  {id:'#1001',customer:'Ahmad Razif', items:[{name:'Classic White T-Shirt',qty:2,price:29.99},{name:'Slim Fit Chinos',qty:1,price:59.99}],total:119.97,status:'Delivered',date:'2026-05-25'},
+  {id:'#1002',customer:'Siti Aishah',items:[{name:'Floral Wrap Dress',qty:1,price:64.99},{name:'Pearl Earrings',qty:1,price:22.99}],total:87.98,status:'Processing',date:'2026-06-01'},
+  {id:'#1003',customer:'Raj Kumar',  items:[{name:'Polo Shirt',qty:1,price:34.99}],total:34.99,status:'Shipped',date:'2026-06-02'},
+];
+
+let editId = null, stockFilter = 'all', fbFilter = 'all';
+let cStock=null, cItems=null, cRev=null, cHealth=null;
+
+// ── NAV ──────────────────────────────────────────────────────────
+function goTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  document.getElementById('page-title').textContent = name.charAt(0).toUpperCase()+name.slice(1);
+  if(name==='dashboard') {renderStats();renderDashCharts();renderRecentOrders();}
+  if(name==='analytics') {renderAnalyticsStats();renderAnalyticsCharts();renderAnalyticsTable();}
+  if(name==='products')  renderProducts();
+  if(name==='stock')     renderStock();
+  if(name==='orders')    renderOrders();
+  if(name==='feedback')  renderFeedback();
+}
+
+// ── STATS ────────────────────────────────────────────────────────
+function renderStats(){
+  document.getElementById('s-products').textContent = products.length;
+  document.getElementById('s-orders').textContent   = orders.length;
+  document.getElementById('s-revenue').textContent  = '$'+orders.reduce((s,o)=>s+o.total,0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('s-low').textContent      = products.filter(p=>p.stock>0&&p.stock<=5).length;
+  // feedback unread count
+  const unread = getFeedback().filter(m=>m.status==='Unread').length;
+  document.getElementById('s-feedback').textContent = unread;
+  const badge = document.getElementById('nav-feedback-badge');
+  badge.textContent = unread;
+  badge.style.display = unread ? 'flex' : 'none';
+}
+
+// ── DASHBOARD CHARTS ─────────────────────────────────────────────
+function renderDashCharts(){
+  const stocks = CATS.map(c=>products.filter(p=>p.cat===c).reduce((s,p)=>s+p.stock,0));
+  const counts = CATS.map(c=>products.filter(p=>p.cat===c).length);
+  if(cStock) cStock.destroy();
+  if(cItems) cItems.destroy();
+  cStock = new Chart(document.getElementById('c-stock'),{
+    type:'bar',
+    data:{labels:CATS,datasets:[{data:stocks,backgroundColor:COLORS,borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#f3f4f6'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+  cItems = new Chart(document.getElementById('c-items'),{
+    type:'doughnut',
+    data:{labels:CATS,datasets:[{data:counts,backgroundColor:COLORS,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'right',labels:{font:{size:11},padding:10}}}}
+  });
+}
+
+// ── RECENT ORDERS ────────────────────────────────────────────────
+function renderRecentOrders(){
+  document.getElementById('recent-orders').innerHTML = orders.slice().reverse().map(o=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6">
+      <div>
+        <p style="font-size:14px;font-weight:600">${o.id} — ${o.customer}</p>
+        <p style="font-size:12px;color:#6b7280">${o.date} · ${o.items.length} item(s)</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-weight:700">$${o.total.toFixed(2)}</span>
+        <span class="badge ${o.status==='Delivered'?'bg':o.status==='Processing'?'ba':'br'}">${o.status}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── ANALYTICS STATS ──────────────────────────────────────────────
+function renderAnalyticsStats(){
+  const val = products.reduce((s,p)=>s+(p.price*p.stock),0);
+  const avg = products.reduce((s,p)=>s+p.price,0)/products.length;
+  const oos = products.filter(p=>p.stock===0).length;
+  document.getElementById('a-val').textContent = '$'+val.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('a-avg').textContent = '$'+avg.toFixed(2);
+  document.getElementById('a-oos').textContent = oos;
+}
+
+// ── ANALYTICS CHARTS ─────────────────────────────────────────────
+function renderAnalyticsCharts(){
+  const revByCat    = CATS.map(c=>products.filter(p=>p.cat===c).reduce((s,p)=>s+(p.price*p.stock),0));
+  const healthByCat = CATS.map(c=>{
+    const cp=products.filter(p=>p.cat===c);
+    return Math.round(((cp.length-cp.filter(p=>p.stock===0).length)/cp.length)*100);
+  });
+  if(cRev)    cRev.destroy();
+  if(cHealth) cHealth.destroy();
+  cRev = new Chart(document.getElementById('c-rev'),{
+    type:'bar',
+    data:{labels:CATS,datasets:[{data:revByCat,backgroundColor:COLORS,borderRadius:6,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,grid:{color:'#f3f4f6'},ticks:{callback:v=>'$'+v.toLocaleString()}},y:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+  cHealth = new Chart(document.getElementById('c-health'),{
+    type:'bar',
+    data:{labels:CATS,datasets:[{data:healthByCat,backgroundColor:healthByCat.map(v=>v>=80?'#3B6D11':v>=50?'#d97706':'#dc2626'),borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,grid:{color:'#f3f4f6'},ticks:{callback:v=>v+'%'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+}
+
+// ── ANALYTICS TABLE ──────────────────────────────────────────────
+function renderAnalyticsTable(){
+  document.getElementById('a-table').innerHTML = CATS.map(c=>{
+    const cp=products.filter(p=>p.cat===c);
+    const ts=cp.reduce((s,p)=>s+p.stock,0);
+    const ap=(cp.reduce((s,p)=>s+p.price,0)/cp.length).toFixed(2);
+    const sv=cp.reduce((s,p)=>s+(p.price*p.stock),0).toFixed(2);
+    const ls=cp.filter(p=>p.stock>0&&p.stock<=5).length;
+    const os=cp.filter(p=>p.stock===0).length;
+    return `<tr>
+      <td style="font-weight:600">${c}</td><td>${cp.length}</td><td>${ts}</td>
+      <td>$${ap}</td><td style="font-weight:600">$${sv}</td>
+      <td>${ls>0?`<span class="badge ba">${ls}</span>`:'—'}</td>
+      <td>${os>0?`<span class="badge br">${os}</span>`:'<span class="badge bg">0</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PRODUCTS ─────────────────────────────────────────────────────
+function renderProducts(){
+  const cat=(document.getElementById('pf-cat').value);
+  const q=(document.getElementById('pf-search').value||'').toLowerCase();
+  const f=products.filter(p=>(!cat||p.cat===cat)&&(!q||p.name.toLowerCase().includes(q)));
+  document.getElementById('product-list').innerHTML = f.map(p=>`
+    <div class="prow">
+      <span style="font-family:monospace;font-size:12px;font-weight:700;color:#9ca3af;min-width:78px">${p.id}</span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="font-size:14px;font-weight:600">${p.name}</span>
+          <span style="font-size:11px;color:#9ca3af">${p.cat}</span>
+        </div>
+        <span style="font-size:12px;color:#6b7280">${p.desc}</span>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <p style="font-size:15px;font-weight:700;color:#185FA5;margin-bottom:4px">$${p.price.toFixed(2)}</p>
+        <span class="badge ${p.stock===0?'br':p.stock<=5?'ba':'bg'}">${p.stock===0?'Out of stock':p.stock+' in stock'}</span>
+      </div>
+      <div style="display:flex;gap:7px;flex-shrink:0">
+        <button onclick="openEdit('${p.id}')" class="btn-s" style="padding:5px 12px;display:flex;align-items:center;gap:4px;font-size:12px"><i class="ti ti-edit" style="font-size:13px"></i>Edit</button>
+        <button onclick="delProduct('${p.id}')" class="btn-d" style="padding:5px 11px" title="Delete"><i class="ti ti-trash" style="font-size:13px"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+// ── STOCK ────────────────────────────────────────────────────────
+function setStockFilter(f,btn){
+  stockFilter=f;
+  document.querySelectorAll('#stock-btns .tbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStock();
+}
+function renderStock(){
+  let f=products;
+  if(stockFilter==='low')      f=products.filter(p=>p.stock>0&&p.stock<=5);
+  else if(stockFilter==='out') f=products.filter(p=>p.stock===0);
+  else if(stockFilter!=='all') f=products.filter(p=>p.cat===stockFilter);
+  const mx=Math.max(...products.map(p=>p.stock),1);
+  document.getElementById('stock-tbody').innerHTML = f.map(p=>`
+    <tr>
+      <td style="font-family:monospace;font-size:12px;font-weight:700;color:#6b7280">${p.id}</td>
+      <td style="font-weight:600">${p.name}</td>
+      <td><span class="badge bb">${p.cat}</span></td>
+      <td>$${p.price.toFixed(2)}</td>
+      <td style="font-weight:700">${p.stock}</td>
+      <td><span class="badge ${p.stock===0?'br':p.stock<=5?'ba':'bg'}">${p.stock===0?'Out of stock':p.stock<=5?'Low stock':'In stock'}</span></td>
+      <td><div class="bar"><div class="bar-fill" style="width:${Math.round((p.stock/mx)*100)}%;background:${p.stock===0?'#E24B4A':p.stock<=5?'#d97706':'#185FA5'}"></div></div></td>
+    </tr>`).join('');
+}
+
+// ── ORDERS ───────────────────────────────────────────────────────
+function renderOrders(){
+  document.getElementById('order-list').innerHTML = orders.slice().reverse().map(o=>`
+    <div class="orow">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-weight:700;font-size:14px">${o.id}</span>
+          <span style="color:#6b7280;font-size:13px">${o.customer} · ${o.date}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-weight:700;font-size:15px">$${o.total.toFixed(2)}</span>
+          <select onchange="updateOrder('${o.id}',this.value)" style="width:auto;padding:5px 10px;font-size:13px">
+            ${['Processing','Shipped','Delivered','Cancelled'].map(s=>`<option${s===o.status?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <p style="font-size:13px;color:#6b7280">${o.items.map(i=>`${i.name} ×${i.qty}`).join(' · ')}</p>
+    </div>`).join('');
+}
+function updateOrder(id,status){const o=orders.find(x=>x.id===id);if(o)o.status=status;}
+
+// ── ADD / EDIT PRODUCT ───────────────────────────────────────────
+function openAdd(){
+  editId=null;
+  document.getElementById('modal-title').textContent='Add product';
+  document.getElementById('m-save').textContent='Add product';
+  document.getElementById('m-err').style.display='none';
+  ['m-name','m-price','m-stock','m-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-cat').value='Men';
+  document.getElementById('modal').classList.add('show');
+}
+function openEdit(id){
+  const p=products.find(x=>x.id===id);
+  editId=id;
+  document.getElementById('modal-title').textContent='Edit product';
+  document.getElementById('m-save').textContent='Save changes';
+  document.getElementById('m-err').style.display='none';
+  document.getElementById('m-name').value=p.name;
+  document.getElementById('m-price').value=p.price;
+  document.getElementById('m-stock').value=p.stock;
+  document.getElementById('m-cat').value=p.cat;
+  document.getElementById('m-desc').value=p.desc;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+function saveProduct(){
+  const name=document.getElementById('m-name').value.trim();
+  const price=parseFloat(document.getElementById('m-price').value);
+  const stock=parseInt(document.getElementById('m-stock').value);
+  const cat=document.getElementById('m-cat').value;
+  const desc=document.getElementById('m-desc').value.trim();
+  if(!name||isNaN(price)||isNaN(stock)){document.getElementById('m-err').style.display='block';return;}
+  document.getElementById('m-err').style.display='none';
+  if(editId){Object.assign(products.find(x=>x.id===editId),{name,price,stock,cat,desc});}
+  else{
+    const prefix={Men:'MEN','Men Accessories':'MAC',Women:'WOM','Women Accessories':'WAC',Kids:'KID','Kids Accessories':'KAC'}[cat]||'PRD';
+    const n=products.filter(p=>p.cat===cat).length+1;
+    products.push({id:`${prefix}-${String(n).padStart(3,'0')}`,name,price,stock,cat,desc,img:''});
+  }
+  closeModal();renderProducts();renderStock();renderStats();
+}
+function delProduct(id){
+  if(!confirm('Delete this product?'))return;
+  const i=products.findIndex(x=>x.id===id);
+  if(i>-1)products.splice(i,1);
+  renderProducts();renderStock();renderStats();
+}
+document.querySelector('.overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+// ── FEEDBACK ─────────────────────────────────────────────────────
+function getFeedback(){
+  return JSON.parse(localStorage.getItem('th_feedback')||'[]');
+}
+function saveFeedback(data){
+  localStorage.setItem('th_feedback',JSON.stringify(data));
+}
+function setFbFilter(f,btn){
+  fbFilter=f;
+  document.querySelectorAll('#tab-feedback .tbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeedback();
+}
+function markRead(id){
+  const msgs=getFeedback();
+  const m=msgs.find(x=>x.id===id);
+  if(m) m.status='Read';
+  saveFeedback(msgs);
+  renderFeedback();
+  renderStats();
+}
+function deleteFeedbackMsg(id){
+  if(!confirm('Delete this message?'))return;
+  saveFeedback(getFeedback().filter(x=>x.id!==id));
+  renderFeedback();
+  renderStats();
+}
+function clearAllFeedback(){
+  if(!confirm('Clear all messages? This cannot be undone.'))return;
+  localStorage.removeItem('th_feedback');
+  renderFeedback();
+  renderStats();
+}
+function renderFeedback(){
+  let msgs=getFeedback();
+  const total=msgs.length;
+  const unread=msgs.filter(m=>m.status==='Unread').length;
+  const read=msgs.filter(m=>m.status==='Read').length;
+
+  // mini stats bar
+  document.getElementById('fb-stats').innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="stat" style="padding:12px 16px;flex:1;min-width:100px">
+        <p style="font-size:11px;color:#6b7280;margin-bottom:4px">Total</p>
+        <p style="font-size:22px;font-weight:700">${total}</p>
+      </div>
+      <div class="stat" style="padding:12px 16px;flex:1;min-width:100px;background:#eff6ff;border-color:#dbeafe">
+        <p style="font-size:11px;color:#6b7280;margin-bottom:4px">Unread</p>
+        <p style="font-size:22px;font-weight:700;color:#185FA5">${unread}</p>
+      </div>
+      <div class="stat" style="padding:12px 16px;flex:1;min-width:100px;background:#f0fdf4;border-color:#bbf7d0">
+        <p style="font-size:11px;color:#6b7280;margin-bottom:4px">Read</p>
+        <p style="font-size:22px;font-weight:700;color:#166534">${read}</p>
+      </div>
+    </div>`;
+
+  if(fbFilter==='unread') msgs=msgs.filter(m=>m.status==='Unread');
+  else if(fbFilter==='read') msgs=msgs.filter(m=>m.status==='Read');
+  msgs=msgs.slice().reverse();
+
+  const el=document.getElementById('feedback-list');
+  if(!msgs.length){
+    el.innerHTML=`<div class="empty-state">
+      <i class="ti ti-mail-off"></i>
+      <p>${fbFilter==='all'?'No messages yet. Messages from customers will appear here.':'No '+fbFilter+' messages.'}</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML=msgs.map(m=>`
+    <div class="fbrow ${m.status==='Unread'?'unread':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <span style="font-weight:700;font-size:14px">${m.name}</span>
+            <span style="font-size:12px;color:#6b7280">${m.email}</span>
+            <span class="badge ${m.status==='Unread'?'bb':'bg'}">${m.status}</span>
+            <span class="badge ba">${m.subject}</span>
+          </div>
+          <p style="font-size:13px;color:#374151;line-height:1.7;margin-bottom:8px">${m.message}</p>
+          <p style="font-size:11px;color:#9ca3af"><i class="ti ti-clock" style="font-size:11px"></i> ${m.date} at ${m.time} &nbsp;·&nbsp; ${m.id}</p>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+          ${m.status==='Unread'?`<button onclick="markRead('${m.id}')" class="btn-s" style="padding:5px 12px;font-size:12px;display:flex;align-items:center;gap:4px"><i class="ti ti-check" style="font-size:13px"></i>Mark read</button>`:''}
+          <button onclick="deleteFeedbackMsg('${m.id}')" class="btn-d" style="padding:5px 11px" title="Delete"><i class="ti ti-trash" style="font-size:13px"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+window.onload=function(){
+  renderStats();
+  renderDashCharts();
+  renderRecentOrders();
+  renderProducts();
+  renderStock();
+  renderOrders();
+  renderAnalyticsStats();
+  renderAnalyticsTable();
+  renderFeedback();
+};
+</script>
+</body>
+</html>

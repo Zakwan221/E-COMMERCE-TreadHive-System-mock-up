@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order — ThreadHive</title>
+<link rel="stylesheet" href="Nav.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fafafa;color:#111}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+
+
+
+
+
+
+
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:48px 24px}
+h1{font-size:32px;font-weight:900;letter-spacing:-.8px;margin-bottom:6px}
+.sub{font-size:14px;color:#888;margin-bottom:36px}
+.layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+/* FORM CARD */
+.card{background:#fff;border-radius:18px;border:1px solid #eee;padding:32px}
+.card h2{font-size:16px;font-weight:800;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid #f5f5f5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.fg label{font-size:11px;font-weight:700;color:#666;letter-spacing:.5px}
+.fg input,.fg select,.fg textarea{padding:11px 14px;border:1.5px solid #eee;border-radius:10px;font-size:14px;font-family:'Inter';outline:none;color:#111;background:#fff;transition:border .15s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#111}
+/* PAYMENT OPTIONS */
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.pay-opt{border:2px solid #eee;border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.pay-opt:hover{border-color:#888}
+.pay-opt.sel{border-color:#111;background:#111;color:#fff}
+.pay-opt svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;display:block;margin:0 auto 6px}
+.pay-opt p{font-size:13px;font-weight:700}
+.submit-btn{width:100%;padding:14px;background:#111;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;transition:background .15s}
+.submit-btn:hover{background:#333}
+.form-err{color:#dc2626;font-size:13px;margin-bottom:10px;display:none;background:#fff0f0;padding:10px 14px;border-radius:8px;border:1px solid #fecaca}
+/* ORDER SUMMARY */
+.summary{background:#fff;border-radius:18px;border:1px solid #eee;padding:26px;position:sticky;top:80px}
+.summary h2{font-size:16px;font-weight:800;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #f5f5f5}
+.s-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f7f7f7;align-items:center}
+.s-img{width:54px;height:54px;object-fit:cover;border-radius:8px;background:#f7f7f7;flex-shrink:0}
+.s-name{font-size:13px;font-weight:700}
+.s-qty{font-size:12px;color:#aaa}
+.s-price{font-size:13px;font-weight:800;margin-left:auto;white-space:nowrap}
+.s-line{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#777}
+.s-total{display:flex;justify-content:space-between;padding:14px 0 0;font-size:16px;font-weight:900;border-top:1px solid #eee;margin-top:6px}
+.free-ship{font-size:12px;color:#16a34a;font-weight:700}
+/* SUCCESS */
+.success{display:none;text-align:center;padding:80px 40px}
+.suc-icon{width:80px;height:80px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+.suc-icon svg{width:36px;height:36px;stroke:#fff;fill:none;stroke-width:2.5}
+.suc-order{display:inline-block;background:#f5f5f5;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;color:#555;margin:14px 0 28px}
+/* ORDER HISTORY */
+.history{margin-top:40px}
+.history h2{font-size:20px;font-weight:800;margin-bottom:16px}
+.h-item{background:#fff;border:1px solid #eee;border-radius:14px;padding:18px 22px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.h-id{font-size:13px;font-weight:800;color:#111}
+.h-meta{font-size:12px;color:#aaa;margin-top:2px}
+.h-status{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px}
+.st-delivered{background:#dcfce7;color:#166534}
+.st-processing{background:#fef9c3;color:#854d0e}
+.st-shipped{background:#dbeafe;color:#1e40af}
+.st-cancelled{background:#fee2e2;color:#991b1b}
+footer{background:#0d0d0d;color:#fff;padding:32px 48px;display:flex;align-items:center;justify-content:space-between;margin-top:64px}
+footer p{font-size:13px;color:rgba(255,255,255,.3)}
+.fl{display:flex;gap:20px}
+.fl a{font-size:13px;color:rgba(255,255,255,.4)}
+.fl a:hover{color:#fff}
+</style>
+</head>
+<body>
+<div id="nav-container"></div>
+
+<div class="page">
+  <!-- CHECKOUT VIEW -->
+  <div id="checkout-view">
+    <h1>Checkout</h1>
+    <p class="sub">Complete your order below</p>
+    <div class="layout">
+      <!-- FORM -->
+      <div class="card">
+        <h2>📦 Delivery Information</h2>
+        <div class="row2">
+          <div class="fg"><label>FIRST NAME*</label><input id="f-first" placeholder="Ahmad"/></div>
+          <div class="fg"><label>LAST NAME*</label><input id="f-last" placeholder="Razif"/></div>
+        </div>
+        <div class="fg"><label>EMAIL ADDRESS*</label><input id="f-email" type="email" placeholder="ahmad@example.com"/></div>
+        <div class="fg"><label>PHONE NUMBER*</label><input id="f-phone" type="tel" placeholder="+60 12-345 6789"/></div>
+        <div class="fg"><label>ADDRESS LINE 1*</label><input id="f-addr1" placeholder="123 Jalan Ampang"/></div>
+        <div class="fg"><label>ADDRESS LINE 2</label><input id="f-addr2" placeholder="Suite / Apartment (optional)"/></div>
+        <div class="row2">
+          <div class="fg"><label>CITY*</label><input id="f-city" placeholder="Kuala Lumpur"/></div>
+          <div class="fg"><label>POSTCODE*</label><input id="f-post" placeholder="50450"/></div>
+        </div>
+        <div class="fg"><label>STATE*</label>
+          <select id="f-state">
+            <option value="">Select state</option>
+            <option>Kuala Lumpur</option><option>Selangor</option><option>Penang</option>
+            <option>Johor</option><option>Perak</option><option>Kedah</option>
+            <option>Kelantan</option><option>Pahang</option><option>Sabah</option>
+            <option>Sarawak</option><option>Terengganu</option><option>Negeri Sembilan</option>
+            <option>Melaka</option><option>Perlis</option><option>Labuan</option>
+          </select>
+        </div>
+
+        <div style="margin-top:22px">
+          <h2 style="font-size:16px;font-weight:800;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #f5f5f5">💳 Payment Method</h2>
+          <div class="pay-grid">
+            <div class="pay-opt sel" id="pay-card" onclick="setPay('card')">
+              <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <p>Card</p>
+            </div>
+            <div class="pay-opt" id="pay-fpx" onclick="setPay('fpx')">
+              <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <p>FPX / Bank</p>
+            </div>
+            <div class="pay-opt" id="pay-cod" onclick="setPay('cod')">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              <p>Cash on Delivery</p>
+            </div>
+          </div>
+          <div id="card-fields">
+            <div class="fg"><label>CARD NUMBER</label><input id="f-cardnum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"/></div>
+            <div class="row2">
+              <div class="fg"><label>EXPIRY (MM/YY)</label><input id="f-expiry" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)"/></div>
+              <div class="fg"><label>CVV</label><input id="f-cvv" placeholder="•••" maxlength="4" type="password"/></div>
+            </div>
+            <div class="fg"><label>NAME ON CARD</label><input id="f-cname" placeholder="Ahmad Razif"/></div>
+          </div>
+        </div>
+        <p class="form-err" id="form-err">⚠ Please fill in all required fields.</p>
+        <button class="submit-btn" onclick="placeOrder()">Place Order →</button>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="summary">
+        <h2>Order Summary</h2>
+        <div id="sum-items"></div>
+        <div id="sum-totals"></div>
+        <div style="margin-top:14px">
+          <a href="shop.html" style="font-size:13px;font-weight:600;color:#aaa;display:block;text-align:center;text-decoration:underline;text-underline-offset:3px">← Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <div class="history" id="history-section">
+      <h2>Past Orders</h2>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- SUCCESS VIEW -->
+  <div class="success" id="success-view">
+    <div class="suc-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h2 style="font-size:32px;font-weight:900;letter-spacing:-1px">Order Confirmed! 🎉</h2>
+    <p style="font-size:15px;color:#777;margin-top:10px">Thank you for your purchase. We'll send a confirmation to your email.</p>
+    <div class="suc-order" id="suc-order-id">Order #TH-000000</div><br>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <a href="shop.html" style="background:#111;color:#fff;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700">Continue Shopping</a>
+      <button onclick="showHistory()" style="background:#fff;color:#111;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700;border:1.5px solid #eee;cursor:pointer">View Orders</button>
+    </div>
+  </div>
+</div>
+
+<footer><p>© 2026 ThreadHive</p><div class="fl"><a href="home.html">Home</a><a href="shop.html">Shop</a><a href="contact.html">Contact</a></div></footer>
+
+<script src="Products.js"></script>
+<script>
+function getCart(){return JSON.parse(localStorage.getItem('th_cart')||'[]');}
+function getOrders(){return JSON.parse(localStorage.getItem('th_orders')||'[]');}
+function saveOrders(o){localStorage.setItem('th_orders',JSON.stringify(o));}
+let payMethod='card';
+
+function setPay(m){
+  payMethod=m;
+  ['card','fpx','cod'].forEach(x=>document.getElementById('pay-'+x).className='pay-opt'+(x===m?' sel':''));
+  document.getElementById('card-fields').style.display=m==='card'?'block':'none';
+}
+function fmtCard(el){const v=el.value.replace(/\D/g,'').match(/.{1,4}/g);el.value=v?v.join(' '):'';}
+function fmtExpiry(el){let v=el.value.replace(/\D/g,'');if(v.length>=2)v=v.slice(0,2)+' / '+v.slice(2);el.value=v;}
+
+function renderSummary(){
+  const cart=getCart();
+  const si=document.getElementById('sum-items');
+  const st=document.getElementById('sum-totals');
+  if(!cart.length){
+    si.innerHTML='<div style="text-align:center;padding:24px 0;color:#aaa"><p style="font-size:14px;margin-bottom:10px">Your cart is empty.</p><a href="shop.html" style="font-size:13px;font-weight:700;color:#111;text-decoration:underline">Go shop →</a></div>';
+    st.innerHTML='';return;
+  }
+  const sub=cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  const ship=sub>=80?0:8.99;
+  const total=sub+ship;
+  si.innerHTML=cart.map(it=>`
+    <div class="s-item">
+      <img src="${it.img}" class="s-img" alt="${it.name}" onerror="this.style.background='#eee'"/>
+      <div style="flex:1"><p class="s-name">${it.name}</p><p class="s-qty">Qty: ${it.qty}</p></div>
+      <span class="s-price">$${(it.price*it.qty).toFixed(2)}</span>
+    </div>`).join('');
+  st.innerHTML=`
+    <div class="s-line"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+    <div class="s-line"><span>Shipping</span><span>${ship===0?'<span class="free-ship">FREE</span>':'$'+ship.toFixed(2)}</span></div>
+    ${sub<80?'<p style="font-size:11px;color:#aaa;margin-bottom:4px">Free shipping on orders over $80</p>':''}
+    <div class="s-total"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
+}
+
+function placeOrder(){
+  const cart=getCart();
+  const req=['f-first','f-last','f-email','f-phone','f-addr1','f-city','f-post','f-state'];
+  const err=document.getElementById('form-err');
+  if(req.some(id=>!document.getElementById(id).value.trim())){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  if(!cart.length){err.innerHTML='⚠ Your cart is empty. Add items from the shop first.';err.style.display='block';return;}
+  err.style.display='none';
+  const sub=cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  const ship=sub>=80?0:8.99;
+  const orderId='TH-'+Date.now().toString(36).toUpperCase();
+  const order={
+    id:orderId,
+    date:new Date().toLocaleDateString('en-MY',{year:'numeric',month:'short',day:'numeric'}),
+    customer:document.getElementById('f-first').value+' '+document.getElementById('f-last').value,
+    email:document.getElementById('f-email').value,
+    address:`${document.getElementById('f-addr1').value}, ${document.getElementById('f-city').value}, ${document.getElementById('f-state').value}`,
+    items:cart,
+    subtotal:sub,shipping:ship,total:sub+ship,
+    payment:payMethod,
+    status:'Processing'
+  };
+  const orders=getOrders();orders.unshift(order);saveOrders(orders);
+  localStorage.removeItem('th_cart');
+  document.getElementById('suc-order-id').textContent='Order #'+orderId;
+  document.getElementById('checkout-view').style.display='none';
+  document.getElementById('success-view').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showHistory(){
+  document.getElementById('success-view').style.display='none';
+  document.getElementById('checkout-view').style.display='block';
+  renderHistory();
+  document.getElementById('history-section').scrollIntoView({behavior:'smooth'});
+}
+
+function renderHistory(){
+  const orders=getOrders();
+  const el=document.getElementById('history-list');
+  if(!orders.length){el.innerHTML='<p style="color:#aaa;font-size:14px">No past orders yet.</p>';return;}
+  el.innerHTML=orders.map(o=>`
+    <div class="h-item">
+      <div style="flex:1">
+        <p class="h-id">#${o.id}</p>
+        <p class="h-meta">${o.date} · ${o.customer} · ${o.items.length} item(s) · $${o.total.toFixed(2)}</p>
+        <p class="h-meta" style="margin-top:3px">${o.address}</p>
+      </div>
+      <span class="h-status st-${o.status.toLowerCase()}">${o.status}</span>
+    </div>`).join('');
+}
+
+renderSummary();
+renderHistory();
+</script>
+<script src="Nav.js"></script>
+</body>
+</html>

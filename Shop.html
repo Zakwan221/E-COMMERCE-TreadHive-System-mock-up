@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shop — ThreadHive</title>
+<link rel="stylesheet" href="Nav.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%;object-fit:cover}
+
+
+
+
+
+
+
+
+
+
+
+
+/* PAGE HEADER */
+.ph{background:#fafafa;padding:44px 48px 32px;border-bottom:1px solid #f0f0f0}
+.ph h1{font-size:34px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+.ph p{font-size:14px;color:#888}
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:230px 1fr;min-height:80vh}
+/* SIDEBAR */
+.sb{padding:28px 22px;border-right:1px solid #f0f0f0;background:#fff;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+.sb-sec{margin-bottom:26px}
+.sb-title{font-size:10px;font-weight:800;letter-spacing:2px;color:#bbb;margin-bottom:12px;display:block}
+.sb input[type=text]{width:100%;padding:10px 12px;border:1.5px solid #eee;border-radius:10px;font-size:13px;font-family:'Inter';outline:none;background:#fafafa;margin-bottom:22px;transition:border .15s}
+.sb input[type=text]:focus{border-color:#111;background:#fff}
+.frow{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer}
+.frow input[type=checkbox]{width:15px;height:15px;accent-color:#111;flex-shrink:0;cursor:pointer}
+.frow label{font-size:13px;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:space-between;flex:1;line-height:1.4}
+.frow label:hover{color:#111}
+.fc{font-size:11px;color:#bbb;margin-left:auto;padding-left:4px}
+input[type=range]{width:100%;accent-color:#111;cursor:pointer;margin-top:4px}
+/* MAIN */
+.main{padding:24px 32px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.toolbar p{font-size:13px;color:#888}
+select.sort-sel{padding:8px 12px;border:1.5px solid #eee;border-radius:8px;font-size:13px;font-family:'Inter';outline:none;color:#111;background:#fff;cursor:pointer}
+/* PRODUCT GRID */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+.p-card{border-radius:16px;overflow:hidden;border:1.5px solid #f0f0f0;background:#fff;transition:box-shadow .2s;cursor:pointer}
+.p-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.09)}
+/* Default image box — accessories */
+.p-img{height:230px;background:#f5f5f5;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.p-img img{width:80%;height:75%;object-fit:contain;object-position:center;transition:transform .4s}
+.p-card:hover .p-img img{transform:scale(1.05)}
+.p-img .no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px;font-weight:600}
+/* Clothing cards (Men / Women / Kids) — taller box, image at 50% width, 90% height, object-contain */
+.p-card.clothing .p-img{height:340px;background:#f9f9f9}
+.p-card.clothing .p-img img{width:50%;height:90%;object-fit:contain;object-position:center;margin:auto}
+.cat-tag{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);color:#111;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.3px;backdrop-filter:blur(4px)}
+.oos-tag{position:absolute;top:10px;right:10px;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.p-info{padding:14px}
+.p-id{font-size:10px;color:#bbb;font-weight:700;letter-spacing:1px;margin-bottom:3px}
+.p-name{font-size:14px;font-weight:800;margin-bottom:4px;line-height:1.3}
+.p-desc{font-size:12px;color:#aaa;margin-bottom:11px;line-height:1.5}
+.p-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.p-price{font-size:16px;font-weight:900}
+.add-btn{width:34px;height:34px;border-radius:8px;background:#111;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.add-btn:hover{background:#333}
+.add-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5}
+.stock-ok{font-size:11px;color:#16a34a;font-weight:600}
+.stock-low{font-size:11px;color:#d97706;font-weight:600}
+.stock-no{font-size:11px;color:#dc2626;font-weight:600}
+.empty{grid-column:1/-1;text-align:center;padding:64px 0;color:#bbb;font-size:15px}
+/* CART DRAWER */
+.cart-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400}
+.cart-bg.on{display:block}
+.cart-drw{position:fixed;top:0;right:-440px;width:420px;height:100vh;background:#fff;z-index:500;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-4px 0 32px rgba(0,0,0,.1)}
+.cart-drw.on{right:0}
+.cd-h{padding:22px 26px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.cd-b{flex:1;overflow-y:auto;padding:18px 26px}
+.cd-f{padding:18px 26px;border-top:1px solid #f0f0f0}
+.c-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f7f7f7}
+.c-img{width:68px;height:68px;object-fit:cover;border-radius:10px;background:#f5f5f5;flex-shrink:0}
+.qbtn{width:28px;height:28px;border:1.5px solid #eee;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.qbtn:hover{background:#f5f5f5}
+.toast{display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:600;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+footer{background:#0d0d0d;color:#fff;padding:32px 48px;display:flex;align-items:center;justify-content:space-between;margin-top:48px}
+footer p{font-size:13px;color:rgba(255,255,255,.3)}
+.fl a{font-size:13px;color:rgba(255,255,255,.4);margin-left:20px}
+.fl a:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<div id="nav-container"></div>
+
+<div class="ph">
+  <h1>All Products</h1>
+  <p id="ph-count">Showing all 54 products</p>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR FILTERS -->
+  <aside class="sb">
+    <input type="text" id="sb-q" placeholder="🔍  Search name or ID..." oninput="render()"/>
+
+    <div class="sb-sec">
+      <span class="sb-title">CATEGORIES</span>
+      <div class="frow"><input type="checkbox" id="f-men" onchange="render()"><label for="f-men">Men <span class="fc">9</span></label></div>
+      <div class="frow"><input type="checkbox" id="f-mac" onchange="render()"><label for="f-mac">Men Accessories <span class="fc">9</span></label></div>
+      <div class="frow"><input type="checkbox" id="f-wom" onchange="render()"><label for="f-wom">Women <span class="fc">9</span></label></div>
+      <div class="frow"><input type="checkbox" id="f-wac" onchange="render()"><label for="f-wac">Women Accessories <span class="fc">9</span></label></div>
+      <div class="frow"><input type="checkbox" id="f-kid" onchange="render()"><label for="f-kid">Kids <span class="fc">9</span></label></div>
+      <div class="frow"><input type="checkbox" id="f-kac" onchange="render()"><label for="f-kac">Kids Accessories <span class="fc">9</span></label></div>
+    </div>
+
+    <div class="sb-sec">
+      <span class="sb-title">MAX PRICE — <span id="plbl">$150</span></span>
+      <input type="range" id="f-price" min="5" max="150" value="150"
+        oninput="document.getElementById('plbl').textContent='$'+this.value; render()"/>
+    </div>
+
+    <div class="sb-sec">
+      <span class="sb-title">AVAILABILITY</span>
+      <div class="frow"><input type="checkbox" id="f-ins" onchange="render()"><label for="f-ins">In Stock Only</label></div>
+    </div>
+
+    <div class="sb-sec">
+      <span class="sb-title">SORT</span>
+      <select class="sort-sel" id="f-sort" onchange="render()" style="width:100%;margin-top:4px">
+        <option value="">Default</option>
+        <option value="pa">Price: Low → High</option>
+        <option value="pd">Price: High → Low</option>
+        <option value="az">Name: A–Z</option>
+      </select>
+    </div>
+  </aside>
+
+  <!-- PRODUCT GRID -->
+  <div class="main">
+    <div class="toolbar">
+      <p id="shown"></p>
+      <a href="shop.html" style="font-size:13px;color:#aaa;font-weight:600" onclick="clearAll(event)">Clear filters</a>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 ThreadHive</p>
+  <div class="fl">
+    <a href="home.html">Home</a>
+    <a href="order.html">Orders</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-bg" id="cart-bg" onclick="closeCart()"></div>
+<div class="cart-drw" id="cart-drw">
+  <div class="cd-h">
+    <span style="font-size:17px;font-weight:800">Cart <span id="cd-cnt" style="font-size:13px;color:#aaa;font-weight:500"></span></span>
+    <button onclick="closeCart()" style="background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;line-height:1">✕</button>
+  </div>
+  <div class="cd-b" id="cd-b"><p style="color:#aaa;font-size:13px;text-align:center;padding:3rem 0">Your cart is empty.</p></div>
+  <div class="cd-f">
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+      <span style="font-weight:700;font-size:15px">Total</span>
+      <span id="cd-tot" style="font-weight:900;font-size:15px">$0.00</span>
+    </div>
+    <button onclick="location.href='order.html'" style="width:100%;padding:14px;background:#111;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">Checkout →</button>
+    <button onclick="closeCart();location.href='shop.html'" style="width:100%;padding:11px;background:#fff;color:#111;border:1.5px solid #eee;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px">Continue Shopping</button>
+  </div>
+</div>
+<div class="toast" id="toast">✓ Added to cart!</div>
+
+<!-- Load shared product data FIRST -->
+<script src="Products.js"></script>
+<script>
+/* ── CART HELPERS ─────────────────────────────────────────── */
+function getCart(){ return JSON.parse(localStorage.getItem('th_cart')||'[]'); }
+function saveCart(c){ localStorage.setItem('th_cart',JSON.stringify(c)); }
+
+function addToCart(name, price, img){
+  const cart = getCart();
+  const ex = cart.find(i=>i.name===name);
+  if(ex) ex.qty++;
+  else cart.push({name, price, img, qty:1});
+  saveCart(cart);
+  refreshBadge();
+  showToast();
+  renderCartBody();
+  openCart();
+}
+
+function refreshBadge(){
+  const n = getCart().reduce((s,i)=>s+i.qty, 0);
+  const b = document.getElementById('cart-badge');
+  b.textContent = n;
+  b.style.display = n ? 'flex' : 'none';
+}
+
+function toggleCart(){
+  document.getElementById('cart-bg').classList.toggle('on');
+  document.getElementById('cart-drw').classList.toggle('on');
+  renderCartBody();
+}
+function openCart(){
+  document.getElementById('cart-bg').classList.add('on');
+  document.getElementById('cart-drw').classList.add('on');
+}
+function closeCart(){
+  document.getElementById('cart-bg').classList.remove('on');
+  document.getElementById('cart-drw').classList.remove('on');
+}
+
+function renderCartBody(){
+  const cart = getCart();
+  const total = cart.reduce((s,i)=>s+(i.price*i.qty), 0);
+  document.getElementById('cd-cnt').textContent = cart.length ? `(${cart.reduce((s,i)=>s+i.qty,0)})` : '';
+  document.getElementById('cd-tot').textContent = '$'+total.toFixed(2);
+  const b = document.getElementById('cd-b');
+  if(!cart.length){ b.innerHTML='<p style="color:#aaa;font-size:13px;text-align:center;padding:3rem 0">Your cart is empty.</p>'; return; }
+  b.innerHTML = cart.map((it,i) => `
+    <div class="c-item">
+      <img src="${it.img}" class="c-img" alt="${it.name}" onerror="this.style.background='#eee';this.style.display='block'"/>
+      <div style="flex:1">
+        <p style="font-size:13px;font-weight:700;margin-bottom:3px">${it.name}</p>
+        <p style="font-size:12px;color:#aaa;margin-bottom:8px">$${it.price.toFixed(2)} each</p>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="qbtn" onclick="chg(${i},-1)">−</button>
+          <span style="font-size:13px;font-weight:700;min-width:20px;text-align:center">${it.qty}</span>
+          <button class="qbtn" onclick="chg(${i},1)">+</button>
+        </div>
+      </div>
+      <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <p style="font-size:14px;font-weight:900">$${(it.price*it.qty).toFixed(2)}</p>
+        <button onclick="rem(${i})" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:18px;line-height:1">✕</button>
+      </div>
+    </div>`).join('');
+}
+function chg(i,d){ const c=getCart(); c[i].qty+=d; if(c[i].qty<=0)c.splice(i,1); saveCart(c); refreshBadge(); renderCartBody(); }
+function rem(i){ const c=getCart(); c.splice(i,1); saveCart(c); refreshBadge(); renderCartBody(); }
+function showToast(){ const t=document.getElementById('toast'); t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+
+/* ── PRODUCT RENDER ───────────────────────────────────────── */
+function stockLabel(s){
+  if(s===0) return '<span class="stock-no">✕ Out of stock</span>';
+  if(s<=3)  return `<span class="stock-low">⚠ Only ${s} left</span>`;
+  return `<span class="stock-ok">✓ In stock (${s})</span>`;
+}
+
+function render(){
+  const q    = document.getElementById('sb-q').value.toLowerCase().trim();
+  const maxP = parseFloat(document.getElementById('f-price').value);
+  const ins  = document.getElementById('f-ins').checked;
+  const sort = document.getElementById('f-sort').value;
+  const CAT_MAP = {
+    'f-men':'Men','f-mac':'Men Accessories',
+    'f-wom':'Women','f-wac':'Women Accessories',
+    'f-kid':'Kids','f-kac':'Kids Accessories'
+  };
+  const activeCats = Object.entries(CAT_MAP)
+    .filter(([id])=>document.getElementById(id).checked)
+    .map(([,v])=>v);
+
+  let list = ALL_PRODUCTS.filter(p => {
+    if(q && !p.name.toLowerCase().includes(q) &&
+           !p.id.toLowerCase().includes(q) &&
+           !p.cat.toLowerCase().includes(q)) return false;
+    if(p.price > maxP) return false;
+    if(activeCats.length && !activeCats.includes(p.cat)) return false;
+    if(ins && p.stock===0) return false;
+    return true;
+  });
+
+  if(sort==='pa') list.sort((a,b)=>a.price-b.price);
+  else if(sort==='pd') list.sort((a,b)=>b.price-a.price);
+  else if(sort==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
+
+  document.getElementById('ph-count').textContent =
+    `Showing ${list.length} of ${ALL_PRODUCTS.length} products`;
+  document.getElementById('shown').textContent =
+    `${list.length} product${list.length!==1?'s':''}`;
+
+  const grid = document.getElementById('grid');
+  if(!list.length){
+    grid.innerHTML = '<div class="empty">No products match your filters.<br><a href="shop.html" style="font-size:14px;font-weight:700;color:#111;text-decoration:underline;margin-top:8px;display:inline-block">Clear filters</a></div>';
+    return;
+  }
+
+  const clothingCats = ['Men','Women','Kids'];
+  grid.innerHTML = list.map(p => {
+    const safeName = p.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    const safeImg  = p.img.replace(/'/g,"\\'");
+    const isCloth  = clothingCats.includes(p.cat);
+    return `
+    <div class="p-card${isCloth?' clothing':''}">
+      <div class="p-img">
+        <img src="${p.img}" alt="${p.name}"
+             onerror="this.parentNode.innerHTML='<div class=\\'no-img\\'>${p.name}</div>'"/>
+        <span class="cat-tag">${p.cat}</span>
+        ${p.stock===0?'<span class="oos-tag">Out of stock</span>':''}
+      </div>
+      <div class="p-info">
+        <p class="p-id">${p.id}</p>
+        <p class="p-name">${p.name}</p>
+        <p class="p-desc">${p.desc}</p>
+        <div class="p-row">
+          <span class="p-price">$${p.price.toFixed(2)}</span>
+          ${p.stock===0
+            ? '<span style="font-size:12px;color:#dc2626;font-weight:600">Unavailable</span>'
+            : `<button class="add-btn" onclick="addToCart('${safeName}',${p.price},'${safeImg}')">
+                 <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+               </button>`}
+        </div>
+        ${stockLabel(p.stock)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function clearAll(e){
+  e.preventDefault();
+  ['f-men','f-mac','f-wom','f-wac','f-kid','f-kac','f-ins']
+    .forEach(id=>document.getElementById(id).checked=false);
+  document.getElementById('sb-q').value='';
+  document.getElementById('f-price').value=150;
+  document.getElementById('plbl').textContent='$150';
+  document.getElementById('f-sort').value='';
+  render();
+}
+
+/* ── INIT ─────────────────────────────────────────────────── */
+// Pre-select category from URL ?cat=Women etc.
+const urlCat = new URLSearchParams(location.search).get('cat');
+if(urlCat){
+  const MAP = {
+    'Men':'f-men','Men Accessories':'f-mac',
+    'Women':'f-wom','Women Accessories':'f-wac',
+    'Kids':'f-kid','Kids Accessories':'f-kac'
+  };
+  if(MAP[urlCat]) document.getElementById(MAP[urlCat]).checked = true;
+}
+
+render();
+refreshBadge();
+</script>
+<script src="Nav.js"></script>
+</body>
+</html>

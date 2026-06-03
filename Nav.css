@@ -1,0 +1,46 @@
+/* ── SHARED NAVBAR — used across all pages ── */
+nav{
+  height:60px;background:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;
+  position:sticky;top:0;z-index:300;
+  border-bottom:1px solid #f0f0f0;
+}
+.nav-logo{
+  font-size:17px;font-weight:900;letter-spacing:-.5px;
+  color:#111;text-decoration:none;
+}
+.nav-pill{
+  display:flex;align-items:center;
+  background:rgba(0,0,0,.05);
+  border-radius:40px;padding:0 6px;height:40px;gap:2px;
+}
+.nav-pill a{
+  font-size:14px;font-weight:500;color:#333;
+  padding:6px 18px;border-radius:30px;
+  transition:all .15s;white-space:nowrap;text-decoration:none;
+}
+.nav-pill a:hover{background:rgba(0,0,0,.07);color:#111}
+.nav-pill a.active{background:#111;color:#fff}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-cart-btn{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.05);border:none;cursor:pointer;
+  transition:background .15s;position:relative;
+}
+.nav-cart-btn:hover{background:rgba(0,0,0,.1)}
+.nav-cart-btn svg{width:18px;height:18px;stroke:#333;fill:none;stroke-width:1.7}
+.cart-badge{
+  position:absolute;top:-5px;right:-5px;
+  background:#111;color:#fff;
+  font-size:9px;font-weight:800;
+  width:16px;height:16px;border-radius:50%;
+  display:none;align-items:center;justify-content:center;
+}
+.logout-link{
+  font-size:13px;font-weight:600;color:#aaa;
+  padding:7px 14px;border-radius:8px;
+  border:1.5px solid #eee;text-decoration:none;transition:all .15s;
+}
+.logout-link:hover{color:#111;border-color:#ccc}

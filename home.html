@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ThreadHive</title>
+<link rel="stylesheet" href="Nav.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block}
+
+
+
+
+
+
+
+/* right icons — 3 device icons matching reference */
+
+
+
+
+
+
+
+
+/* ── HERO ── */
+.hero{
+  display:grid;
+  grid-template-columns:42% 58%;
+  min-height:540px;
+  overflow:hidden;
+}
+.hero-text{
+  padding:80px 56px 80px 48px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  background:#fff;
+}
+.hero-text h1{
+  font-size:58px;font-weight:900;
+  line-height:1.0;letter-spacing:-2px;
+  color:#111;margin-bottom:24px;
+  text-align:left;
+}
+.hero-text p{
+  font-size:13.5px;color:#999;
+  line-height:1.85;max-width:320px;
+  margin-bottom:36px;
+  text-align:center;
+}
+.hero-btns{display:flex;gap:12px;align-items:center}
+.btn-black{
+  background:#111;color:#fff;
+  padding:13px 28px;border-radius:10px;
+  font-size:14px;font-weight:700;
+  border:none;cursor:pointer;transition:background .15s;
+}
+.btn-black:hover{background:#333}
+.btn-outline{
+  background:#fff;color:#111;
+  padding:12px 26px;border-radius:10px;
+  font-size:14px;font-weight:600;
+  border:1.5px solid #ccc;cursor:pointer;transition:all .15s;
+}
+.btn-outline:hover{border-color:#111;color:#111}
+.hero-photo{overflow:hidden;background:#e8e5e0;display:flex}
+.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+
+/* ── CATEGORY PILLS ── */
+.cats{padding:32px 48px;border-bottom:1px solid #f0f0f0}
+.cats-label{font-size:10px;font-weight:800;letter-spacing:2px;color:#bbb;margin-bottom:14px}
+.cats-row{display:flex;gap:8px;flex-wrap:wrap}
+.cat-chip{
+  padding:8px 18px;border-radius:24px;
+  border:1.5px solid #eee;font-size:13px;font-weight:600;color:#666;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.cat-chip:hover,.cat-chip.active{background:#111;color:#fff;border-color:#111}
+
+/* ── FEATURED PICKS — clothing style cards ── */
+.section{padding:48px 48px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px}
+.sec-head h2{font-size:22px;font-weight:900;letter-spacing:-.5px}
+.sec-head a{font-size:13px;font-weight:600;color:#aaa;transition:color .15s}
+.sec-head a:hover{color:#111}
+
+/* Clothing card — tall, image at 50% width 90% height centred */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{
+  border-radius:16px;overflow:hidden;
+  border:1.5px solid #f0f0f0;background:#fff;
+  cursor:pointer;transition:box-shadow .2s;
+}
+.feat-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.09)}
+.feat-img{
+  height:340px;background:#f9f9f9;overflow:hidden;
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.feat-img img{
+  width:50%;height:90%;
+  object-fit:contain;object-position:center;
+  transition:transform .4s;
+}
+.feat-card:hover .feat-img img{transform:scale(1.05)}
+.feat-tag{
+  position:absolute;top:12px;left:12px;
+  background:rgba(255,255,255,.92);color:#111;
+  font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;
+  letter-spacing:.3px;
+}
+.feat-info{padding:16px}
+.feat-cat{font-size:10px;color:#bbb;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.feat-name{font-size:15px;font-weight:800;margin-bottom:4px}
+.feat-desc{font-size:12px;color:#aaa;margin-bottom:12px;line-height:1.5}
+.feat-row{display:flex;align-items:center;justify-content:space-between}
+.feat-price{font-size:16px;font-weight:900}
+.add-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:#111;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background .15s;
+}
+.add-btn:hover{background:#333}
+.add-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* ── BANNER ── */
+.banner{
+  margin:0 48px 52px;background:#111;color:#fff;
+  border-radius:24px;padding:52px 56px;
+  display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:center;
+}
+.banner h2{font-size:36px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+.banner p{font-size:14px;color:rgba(255,255,255,.5);line-height:1.75;margin-bottom:22px}
+.stats-row{display:flex;gap:36px}
+.stat-num{font-size:40px;font-weight:900;line-height:1}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.5px;margin-top:4px}
+
+/* ── HIGHLIGHT — Women Accessories (6 cards, 3 per row) ── */
+.hl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.hl-card{
+  border-radius:14px;overflow:hidden;
+  border:1.5px solid #f0f0f0;background:#fff;
+  cursor:pointer;transition:box-shadow .2s;
+}
+.hl-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08)}
+/* accessories image: 80% width 75% height centred */
+.hl-img{
+  height:200px;background:#f7f7f7;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.hl-img img{
+  width:80%;height:75%;
+  object-fit:contain;object-position:center;
+  transition:transform .35s;
+}
+.hl-card:hover .hl-img img{transform:scale(1.06)}
+.hl-info{padding:12px 14px 14px}
+.hl-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.hl-price{font-size:12px;color:#aaa;font-weight:500}
+.hl-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+
+/* ── FOOTER ── */
+footer{
+  background:#0d0d0d;color:#fff;
+  padding:52px 48px 28px;
+  display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:32px;
+}
+.f-logo{font-size:18px;font-weight:900;margin-bottom:10px}
+.f-desc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.8;max-width:210px;margin-bottom:18px}
+.f-social{display:flex;gap:10px}
+.f-social a{width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+.f-social a:hover{border-color:rgba(255,255,255,.4)}
+.f-social svg{width:15px;height:15px;stroke:rgba(255,255,255,.55);fill:none;stroke-width:1.8}
+.f-col h4{font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.3);margin-bottom:14px}
+.f-col a{display:block;font-size:13px;color:rgba(255,255,255,.5);margin-bottom:9px;transition:color .15s}
+.f-col a:hover{color:#fff}
+.f-bottom{
+  background:#0d0d0d;border-top:1px solid rgba(255,255,255,.06);
+  padding:14px 48px;font-size:12px;color:rgba(255,255,255,.2);text-align:center;
+}
+
+/* ── CART DRAWER ── */
+.cart-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400}
+.cart-overlay.open{display:block}
+.cart-drawer{
+  position:fixed;top:0;right:-440px;width:420px;height:100vh;
+  background:#fff;z-index:500;
+  transition:right .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  box-shadow:-4px 0 32px rgba(0,0,0,.1);
+}
+.cart-drawer.open{right:0}
+.cd-head{padding:22px 26px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.cd-body{flex:1;overflow-y:auto;padding:18px 26px}
+.cd-foot{padding:18px 26px;border-top:1px solid #f0f0f0}
+.c-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f7f7f7}
+.c-img{width:68px;height:68px;object-fit:cover;border-radius:10px;background:#f7f7f7;flex-shrink:0}
+.qbtn{width:28px;height:28px;border:1.5px solid #eee;border-radius:6px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .12s}
+.qbtn:hover{background:#f5f5f5}
+.toast{display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:600;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div id="nav-container"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>Wear What<br>Represents<br>You</h1>
+    <p>Comfortable and stylish clothing made from soft, breathable fabric. Suitable for daily wear and special occasions. Available in different sizes and fully customizable with your own design, logo, or text. High-quality printing that lasts long and does not fade easily.</p>
+    <div class="hero-btns">
+      <button class="btn-black" onclick="location.href='shop.html'">Buy Now</button>
+      <button class="btn-outline" onclick="location.href='contact.html'">Contact Us</button>
+    </div>
+  </div>
+  <div class="hero-photo">
+    <img src="headline.png" alt="ThreadHive Collection"/>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="cats">
+  <p class="cats-label">SHOP BY CATEGORY</p>
+  <div class="cats-row">
+    <div class="cat-chip active" onclick="location.href='shop.html'">All</div>
+    <div class="cat-chip" onclick="location.href='shop.html?cat=Men'">Men</div>
+    <div class="cat-chip" onclick="location.href='shop.html?cat=Men+Accessories'">Men Accessories</div>
+    <div class="cat-chip" onclick="location.href='shop.html?cat=Women'">Women</div>
+    <div class="cat-chip" onclick="location.href='shop.html?cat=Women+Accessories'">Women Accessories</div>
+    <div class="cat-chip" onclick="location.href='shop.html?cat=Kids'">Kids</div>
+    <div class="cat-chip" onclick="location.href='shop.html?cat=Kids+Accessories'">Kids Accessories</div>
+  </div>
+</div>
+
+<!-- FEATURED PICKS — clothing cards -->
+<section class="section">
+  <div class="sec-head">
+    <h2>Featured Picks</h2>
+    <a href="shop.html">View all →</a>
+  </div>
+  <div class="feat-grid" id="feat-grid"></div>
+</section>
+
+<!-- BANNER -->
+<div class="banner">
+  <div>
+    <h2>New Season.<br>New You.</h2>
+    <p>Explore our latest collection — crafted for those who lead with style and live with purpose.</p>
+    <button class="btn-black" style="background:#fff;color:#111" onclick="location.href='shop.html'">Explore Collection →</button>
+  </div>
+  <div class="stats-row">
+    <div><div class="stat-num">54</div><div class="stat-lbl">STYLES</div></div>
+    <div><div class="stat-num">6</div><div class="stat-lbl">CATEGORIES</div></div>
+    <div><div class="stat-num">100%</div><div class="stat-lbl">QUALITY</div></div>
+  </div>
+</div>
+
+<!-- HIGHLIGHT — Women Accessories -->
+<section class="section" style="padding-top:0">
+  <div class="sec-head">
+    <h2>Women Accessories</h2>
+    <a href="shop.html?cat=Women+Accessories">See all →</a>
+  </div>
+  <div class="hl-grid" id="hl-grid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="f-logo">ThreadHive</div>
+    <p class="f-desc">Your go-to destination for fashion that speaks your language.</p>
+    <div class="f-social">
+      <a href="#"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg></a>
+    </div>
+  </div>
+  <div class="f-col">
+    <h4>SHOP</h4>
+    <a href="shop.html">All Products</a>
+    <a href="shop.html?cat=Men">Men</a>
+    <a href="shop.html?cat=Women">Women</a>
+    <a href="shop.html?cat=Kids">Kids</a>
+  </div>
+  <div class="f-col">
+    <h4>HELP</h4>
+    <a href="contact.html">Contact Us</a>
+    <a href="order.html">Track Order</a>
+    <a href="contact.html#faq">FAQ</a>
+  </div>
+  <div class="f-col">
+    <h4>ACCOUNT</h4>
+    <a href="index.html">Login</a>
+    <a href="order.html">My Orders</a>
+  </div>
+</footer>
+<div class="f-bottom">© 2026 ThreadHive. All rights reserved.</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cd-head">
+    <span style="font-size:17px;font-weight:800">Cart <span id="cd-count" style="font-size:13px;color:#aaa;font-weight:500"></span></span>
+    <button onclick="closeCart()" style="background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;line-height:1">✕</button>
+  </div>
+  <div class="cd-body" id="cd-body">
+    <p style="color:#aaa;font-size:13px;text-align:center;padding:3rem 0">Your cart is empty.</p>
+  </div>
+  <div class="cd-foot">
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+      <span style="font-weight:700;font-size:15px">Total</span>
+      <span id="cd-total" style="font-weight:900;font-size:15px">$0.00</span>
+    </div>
+    <button onclick="location.href='order.html'" style="width:100%;padding:14px;background:#111;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer">Checkout →</button>
+    <button onclick="closeCart()" style="width:100%;padding:11px;background:#fff;color:#111;border:1.5px solid #eee;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px">Continue Shopping</button>
+  </div>
+</div>
+<div class="toast" id="toast">✓ Added to cart!</div>
+
+<script src="Products.js"></script>
+<script>
+/* ── CART ────────────────────────────────── */
+function getCart(){ return JSON.parse(localStorage.getItem('th_cart')||'[]'); }
+function saveCart(c){ localStorage.setItem('th_cart',JSON.stringify(c)); }
+
+function addToCart(name, price, img){
+  const cart = getCart();
+  const ex = cart.find(i=>i.name===name);
+  if(ex) ex.qty++;
+  else cart.push({name, price, img, qty:1});
+  saveCart(cart);
+  refreshBadge();
+  showToast();
+  renderCartBody();
+  openCart();
+}
+
+function refreshBadge(){
+  const n = getCart().reduce((s,i)=>s+i.qty, 0);
+  const b = document.getElementById('cart-badge');
+  b.textContent = n; b.style.display = n?'flex':'none';
+}
+function toggleCart(){
+  document.getElementById('cart-overlay').classList.toggle('open');
+  document.getElementById('cart-drawer').classList.toggle('open');
+  renderCartBody();
+}
+function openCart(){
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-drawer').classList.add('open');
+}
+function closeCart(){
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-drawer').classList.remove('open');
+}
+function renderCartBody(){
+  const cart = getCart();
+  const total = cart.reduce((s,i)=>s+(i.price*i.qty), 0);
+  document.getElementById('cd-count').textContent = cart.length?`(${cart.reduce((s,i)=>s+i.qty,0)})`:'';
+  document.getElementById('cd-total').textContent = '$'+total.toFixed(2);
+  const b = document.getElementById('cd-body');
+  if(!cart.length){ b.innerHTML='<p style="color:#aaa;font-size:13px;text-align:center;padding:3rem 0">Your cart is empty.</p>'; return; }
+  b.innerHTML = cart.map((it,i)=>`
+    <div class="c-item">
+      <img src="${it.img}" class="c-img" alt="${it.name}" onerror="this.style.background='#eee'"/>
+      <div style="flex:1">
+        <p style="font-size:13px;font-weight:700;margin-bottom:3px">${it.name}</p>
+        <p style="font-size:12px;color:#aaa;margin-bottom:8px">$${it.price.toFixed(2)}</p>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="qbtn" onclick="chg(${i},-1)">−</button>
+          <span style="font-size:13px;font-weight:700;min-width:20px;text-align:center">${it.qty}</span>
+          <button class="qbtn" onclick="chg(${i},1)">+</button>
+        </div>
+      </div>
+      <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <p style="font-size:14px;font-weight:900">$${(it.price*it.qty).toFixed(2)}</p>
+        <button onclick="rem(${i})" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:18px">✕</button>
+      </div>
+    </div>`).join('');
+}
+function chg(i,d){ const c=getCart(); c[i].qty+=d; if(c[i].qty<=0)c.splice(i,1); saveCart(c); refreshBadge(); renderCartBody(); }
+function rem(i){ const c=getCart(); c.splice(i,1); saveCart(c); refreshBadge(); renderCartBody(); }
+function showToast(){ const t=document.getElementById('toast'); t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+
+/* ── FEATURED PICKS — 6 clothing items (2 Men, 2 Women, 2 Kids) ── */
+const featIds = ['MEN-003','MEN-006','WOM-001','WOM-004','KID-003','KID-006'];
+const featProducts = featIds.map(id => ALL_PRODUCTS.find(p=>p.id===id)).filter(Boolean);
+
+document.getElementById('feat-grid').innerHTML = featProducts.map(p => {
+  const safe = p.name.replace(/'/g,"\\'");
+  return `
+  <div class="feat-card">
+    <div class="feat-img">
+      <img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'"/>
+      <span class="feat-tag">${p.cat}</span>
+    </div>
+    <div class="feat-info">
+      <p class="feat-cat">${p.cat.toUpperCase()}</p>
+      <p class="feat-name">${p.name}</p>
+      <p class="feat-desc">${p.desc}</p>
+      <div class="feat-row">
+        <span class="feat-price">$${p.price.toFixed(2)}</span>
+        ${p.stock===0
+          ? '<span style="font-size:12px;color:#dc2626;font-weight:600">Out of stock</span>'
+          : `<button class="add-btn" onclick="addToCart('${safe}',${p.price},'${p.img}')">
+               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+             </button>`}
+      </div>
+    </div>
+  </div>`;
+}).join('');
+
+/* ── HIGHLIGHT — all 9 Women Accessories, 3 per row ── */
+const womenAcc = ALL_PRODUCTS.filter(p => p.cat === 'Women Accessories');
+
+document.getElementById('hl-grid').innerHTML = womenAcc.map(p => {
+  const safe = p.name.replace(/'/g,"\\'");
+  return `
+  <div class="hl-card">
+    <div class="hl-img">
+      <img src="${p.img}" alt="${p.name}" onerror="this.style.display='none'"/>
+    </div>
+    <div class="hl-info">
+      <p class="hl-name">${p.name}</p>
+      <p class="hl-price">$${p.price.toFixed(2)}</p>
+      <div class="hl-row">
+        <span style="font-size:11px;color:${p.stock===0?'#dc2626':p.stock<=3?'#d97706':'#16a34a'};font-weight:600">
+          ${p.stock===0?'Out of stock':p.stock<=3?'Only '+p.stock+' left':'In stock'}
+        </span>
+        ${p.stock===0
+          ? ''
+          : `<button class="add-btn" onclick="addToCart('${safe}',${p.price},'${p.img}')">
+               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+             </button>`}
+      </div>
+    </div>
+  </div>`;
+}).join('');
+
+refreshBadge();
+</script>
+<script src="Nav.js"></script>
+</body>
+</html>
